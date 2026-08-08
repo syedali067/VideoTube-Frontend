@@ -17,11 +17,12 @@ export default function TweetsPage() {
 
     const { data, isLoading } = useQuery({
         queryKey: ["tweets", user?._id],
-        queryFn: () => api.get(`/tweets/user/${user._id}`),
-        enabled: !!user,
+        queryFn: () => api.get(`/tweets/user/${user?._id}`),
+        enabled: !!user?._id,
     });
 
     function invalidate() {
+        if (!user?._id) return;
         queryClient.invalidateQueries({ queryKey: ["tweets", user._id] });
     }
 
@@ -47,6 +48,10 @@ export default function TweetsPage() {
 
     async function handleLike(tweetId) {
         await api.post(`/likes/toggle/t/${tweetId}`);
+    }
+
+    if (!user) {
+        return <p className="p-6 text-text-muted">Please log in to view your tweets.</p>;
     }
 
     const tweets = data?.data || [];

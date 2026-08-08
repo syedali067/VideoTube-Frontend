@@ -15,6 +15,11 @@ export default async function ChannelPage({ params }) {
     });
     const videos = videosRes.data.docs;
 
+    const tweetsRes = await apiFetchServer(`/tweets/user/${channel._id}`, {
+        next: { revalidate: 60 },
+    });
+    const tweets = tweetsRes.data;
+
     return (
         <main>
             <div
@@ -38,6 +43,19 @@ export default async function ChannelPage({ params }) {
                     {videos.map((video) => (
                         <VideoCard key={video._id} video={video} />
                     ))}
+                </div>
+
+                <h2 className="text-display text-lg font-semibold mb-4">Tweets</h2>
+                <div className="flex flex-col gap-3 pb-8">
+                    {tweets.length === 0 ? (
+                        <p className="text-text-muted text-sm">No tweets yet.</p>
+                    ) : (
+                        tweets.map((tweet) => (
+                            <div key={tweet._id} className="bg-surface border border-border rounded-lg p-3">
+                                <p className="text-sm text-text">{tweet.content}</p>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </main>
